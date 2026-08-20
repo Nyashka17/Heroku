@@ -1,0 +1,736 @@
+<!--
+  ©️ Dan Gazizullin, 2021-2023
+  This file is a part of Hikka Userbot
+  🌐 https://github.com/hikariatama/Hikka
+  You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+  🔑 https://www.gnu.org/licenses/agpl-3.0.html
+-->
+
+<!--
+  ©️ Codrago, 2024-2030
+  This file is a part of Heroku Userbot
+  🌐 https://github.com/coddrago/Heroku
+  You can redistribute it and/or modify it under the terms of the GNU AGPLv3
+  🔑 https://www.gnu.org/licenses/agpl-3.0.html
+-->
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;500;700&family=Zen+Kaku+Gothic+New:wght@300;400;700&display=swap">
+  <title>Heroku Userbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="icon" href="https://github.com/hikariatama/assets/raw/master/cherry-blossom_1f338.png">
+  {% block head %}{% endblock %}
+  <style>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #111111;
+      --bg-card: rgba(20, 5, 5, 0.85);
+      --accent-red: #c41e3a;
+      --accent-red-dark: #8b0000;
+      --accent-red-light: #ff2d55;
+      --accent-gold: #d4af37;
+      --accent-gold-light: #ffd700;
+      --text-primary: #f5f5f5;
+      --text-secondary: #b0b0b0;
+      --text-muted: #666666;
+      --border-color: rgba(196, 30, 58, 0.4);
+      --glow-red: rgba(196, 30, 58, 0.6);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Animated Japanese background */
+    .jp-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a0505 50%, #0a0a0a 100%);
+    }
+
+    .jp-bg::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(196, 30, 58, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 0, 0, 0.15) 0%, transparent 50%);
+      animation: bgPulse 8s ease-in-out infinite;
+    }
+
+    @keyframes bgPulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* Floating sakura petals */
+    .sakura-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .petal {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: radial-gradient(ellipse at center, rgba(255, 183, 197, 0.8) 0%, rgba(196, 30, 58, 0.4) 100%);
+      border-radius: 50% 0 50% 0;
+      opacity: 0;
+      animation: petalFall linear infinite;
+    }
+
+    @keyframes petalFall {
+      0% {
+        opacity: 0;
+        transform: translateY(-10vh) rotate(0deg) translateX(0);
+      }
+      10% {
+        opacity: 0.8;
+      }
+      90% {
+        opacity: 0.6;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(110vh) rotate(720deg) translateX(100px);
+      }
+    }
+
+    /* Rising smoke effect */
+    .smoke-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .smoke {
+      position: absolute;
+      bottom: -50px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(196, 30, 58, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: smokeRise 12s ease-out infinite;
+    }
+
+    @keyframes smokeRise {
+      0% {
+        opacity: 0;
+        transform: translateY(0) scale(1);
+      }
+      20% {
+        opacity: 0.4;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100vh) scale(3);
+      }
+    }
+
+    /* Main content area */
+    .main_content {
+      display: none;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Wrapper for centering */
+    .wrapper {
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* Japanese-style card */
+    .blur {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      backdrop-filter: blur(12px);
+      position: relative;
+      z-index: 99;
+      box-shadow: 
+        0 0 30px rgba(196, 30, 58, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+    }
+
+    .blur::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--accent-red) 20%, 
+        var(--accent-gold) 50%, 
+        var(--accent-red) 80%, 
+        transparent 100%);
+      opacity: 0.8;
+    }
+
+    /* Title styling */
+    .title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text-primary);
+      position: relative;
+      z-index: 2;
+      text-shadow: 0 0 20px rgba(196, 30, 58, 0.5);
+      letter-spacing: 0.1em;
+    }
+
+    .title::after {
+      content: '';
+      display: block;
+      width: 60%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-red), transparent);
+      margin: 1rem auto 0;
+    }
+
+    /* Description text */
+    .description {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.8;
+      font-weight: 300;
+    }
+
+    /* Japanese label */
+    .heroku_label {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, var(--accent-red-dark) 0%, var(--accent-red) 100%);
+      padding: 12px 24px;
+      border-radius: 2px;
+      font-family: 'Noto Serif JP', serif;
+      color: var(--text-primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      box-shadow: 
+        0 4px 15px rgba(196, 30, 58, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--accent-red-light);
+    }
+
+    .ringed_planet {
+      height: 28px;
+      filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
+    }
+
+    /* Buttons */
+    .button {
+      position: relative;
+      padding: 14px 32px;
+      border: 1px solid var(--accent-red);
+      background: linear-gradient(135deg, rgba(196, 30, 58, 0.15) 0%, rgba(139, 0, 0, 0.15) 100%);
+      color: var(--text-primary);
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      text-transform: uppercase;
+      min-height: 48px;
+    }
+
+    .button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(196, 30, 58, 0.3), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .button:hover {
+      border-color: var(--accent-red-light);
+      box-shadow: 
+        0 0 25px rgba(196, 30, 58, 0.4),
+        inset 0 0 20px rgba(196, 30, 58, 0.1);
+      transform: translateY(-2px);
+      color: var(--accent-gold-light);
+    }
+
+    .button:hover::before {
+      left: 100%;
+    }
+
+    .button:active {
+      transform: translateY(0);
+      transition: transform 0.1s ease;
+    }
+
+    .button i {
+      margin-left: 0.5em;
+      opacity: 0.8;
+    }
+
+    .button {
+      margin: 8px 4px;
+    }
+
+    /* Input fields */
+    input {
+      outline: none;
+      color: var(--text-primary);
+      text-align: center;
+      border-radius: 2px;
+      padding: 12px 20px;
+      border: 1px solid var(--border-color);
+      background: rgba(10, 10, 10, 0.8);
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    input:focus {
+      border-color: var(--accent-red);
+      box-shadow: 
+        0 0 15px rgba(196, 30, 58, 0.3),
+        inset 0 0 10px rgba(196, 30, 58, 0.1);
+    }
+
+    input::placeholder {
+      color: var(--text-muted);
+    }
+
+    label {
+      margin: 0 10px;
+      color: var(--text-secondary);
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      user-select: none;
+    }
+
+    /* Hide blocks */
+    #denyqr,
+    #continue_btn,
+    #block_api_id,
+    #block_api_hash,
+    #block_phone,
+    #block_2fa,
+    #block_custom_bot,
+    #block_qr_login {
+      display: none;
+    }
+
+    /* Center utilities */
+    .horiz_center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .vert_center {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Center container */
+    .center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* Auth overlay */
+    .auth {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      margin: auto;
+      width: 50%;
+      height: 60%;
+      padding: 2rem;
+      display: none;
+      z-index: 1000;
+    }
+
+    @media screen and (max-width: 736px) {
+      .auth {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+    }
+
+    .confirm_auth {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.8rem;
+      text-align: center;
+      color: var(--text-primary);
+      padding: 1rem 0;
+      text-shadow: 0 0 10px rgba(196, 30, 58, 0.5);
+    }
+
+    .waiting_for_auth {
+      font-size: 1.1rem;
+      text-align: center;
+      color: var(--text-secondary);
+      padding: 1rem 0;
+      letter-spacing: 0.1em;
+    }
+
+    /* Code input form */
+    .auth-code-form,
+    .eula-form {
+      display: none;
+      width: 60%;
+      height: 80%;
+      padding: 2rem;
+      border-radius: 4px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      margin: auto;
+      z-index: 101;
+      text-align: center;
+    }
+
+    .eula-form .code-caption {
+      padding: 0 30px;
+    }
+
+    .eula-form {
+      height: 60%;
+      width: 50%;
+    }
+
+    @media screen and (max-width: 736px) {
+      .auth-code-form,
+      .eula-form {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+    }
+
+    .enter {
+      padding: 8px 16px;
+      border: 1px solid var(--accent-red);
+      color: var(--accent-red-light);
+      font-size: 1.1rem;
+      font-weight: 500;
+      border-radius: 2px;
+      width: auto;
+      margin: 1rem auto;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+      display: none;
+      background: rgba(196, 30, 58, 0.1);
+      cursor: pointer;
+    }
+
+    .enter:hover {
+      background: var(--accent-red);
+      color: var(--text-primary);
+      box-shadow: 0 0 20px rgba(196, 30, 58, 0.4);
+    }
+
+    @media screen and (max-width: 736px) {
+      .enter {
+        display: inline-block;
+      }
+    }
+
+    .enter.tgcode {
+      display: none;
+    }
+
+    .enter:active {
+      transform: scale(0.98);
+    }
+
+    /* Animation containers */
+    #monkey,
+    #monkey-close,
+    #law,
+    #installation_icon,
+    #tg_icon {
+      height: 200px;
+      margin: 1.5rem auto;
+    }
+
+    #monkey-close {
+      display: none;
+    }
+
+    /* Code input */
+    .code-input {
+      width: 50%;
+      margin-top: 1.5rem;
+      height: 44px;
+      border-radius: 2px;
+      border: 1px solid var(--border-color);
+      background: rgba(10, 10, 10, 0.9);
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+      letter-spacing: 0.2em;
+    }
+
+    .code-input:focus {
+      border-color: var(--accent-red);
+      box-shadow: 0 0 20px rgba(196, 30, 58, 0.3);
+      outline: none;
+    }
+
+    .code-caption {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.2rem;
+      color: var(--text-primary);
+      padding-top: 2rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* Guide list */
+    .tg_guide ol {
+      list-style: none;
+      counter-reset: item;
+      padding: 0 2rem;
+      text-align: left;
+    }
+
+    .tg_guide ol li {
+      counter-increment: item;
+      margin: 1rem 0;
+      display: flex;
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .tg_guide ol li::before {
+      content: counter(item);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 1.5rem;
+      height: 1.5rem;
+      margin-right: 1rem;
+      background: linear-gradient(135deg, var(--accent-red) 0%, var(--accent-red-dark) 100%);
+      border-radius: 2px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      box-shadow: 0 0 10px rgba(196, 30, 58, 0.3);
+    }
+
+    /* QR code container */
+    .qr_outer {
+      display: inline-block;
+      padding: 20px;
+      border-radius: 4px;
+      background: rgba(10, 10, 10, 0.9);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 0 30px rgba(196, 30, 58, 0.2);
+    }
+
+    .qr_inner {
+      display: inline-block;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    /* Finish block */
+    .finish_block {
+      display: none;
+    }
+
+    /* Retro CRT effect */
+    .crt::after {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: rgba(18, 16, 16, 0.1);
+      opacity: 0;
+      z-index: 9999;
+      pointer-events: none;
+      animation: flicker 0.15s infinite;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.02; }
+      50% { opacity: 0.05; }
+      100% { opacity: 0.02; }
+    }
+
+    /* Scanline effect */
+    .scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9998;
+      pointer-events: none;
+      opacity: 0.03;
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.03) 50%,
+        rgba(0, 0, 0, 0.03) 50%
+      );
+      background-size: 100% 4px;
+    }
+
+    /* Responsive */
+    @media screen and (max-width: 736px) {
+      .blur {
+        width: 100%;
+        min-height: 100vh;
+        padding: 1.5rem;
+        border-radius: 0;
+        border: none;
+      }
+
+      .title {
+        font-size: 1.8rem;
+        height: auto;
+        line-height: normal;
+      }
+
+      .description {
+        font-size: 0.9rem;
+      }
+
+      .heroku_label {
+        font-size: 1.2rem;
+        padding: 10px 18px;
+      }
+
+      .button {
+        padding: 12px 24px;
+        font-size: 0.85rem;
+      }
+
+      input {
+        font-size: 0.85rem;
+        padding: 10px 16px;
+      }
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent-red-dark);
+      border-radius: 2px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-red);
+    }
+
+    /* Selection */
+    ::selection {
+      background: var(--accent-red);
+      color: var(--text-primary);
+    }
+
+    /* Loading animation */
+    .loading-dots::after {
+      content: '...';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+  </style>
+</head>
+
+<body class="crt">
+  <div class="scanlines"></div>
+  
+  <div class="jp-bg"></div>
+  
+  <div class="sakura-container" id="sakura"></div>
+  
+  <div class="smoke-container" id="smoke"></div>
+
+  <div class="main_content">{% block content %}{% endblock %}</div>
+  {% block after %}{% endblock %}
+</body>
+
+</html>

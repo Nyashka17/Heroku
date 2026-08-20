@@ -12,6 +12,7 @@
 
 import inspect
 import logging
+import re
 import typing
 from asyncio import Event
 
@@ -212,6 +213,10 @@ class Events(InlineUnit):
             else call.data
         )
         user_id = call.sender_id
+
+        if re.search(r"authorize_web_(.{8})", call.data):
+            self._web_auth_tokens += [re.search(r"authorize_web_(.{8})", call.data)[1]]
+            return
 
         for func in self._allmodules.callback_handlers.values():
             if await self.check_inline_security(func=func, user=user_id):

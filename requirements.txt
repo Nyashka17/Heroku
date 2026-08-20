@@ -17,5 +17,8 @@ ruamel.yaml==0.17.21
 bs4==0.0.2
 orjson
 Pillow
+aiohttp_jinja2==1.5
+Jinja2==3.0.3
+werkzeug==2.2.2
 
 # Python 3.10+
