@@ -6,7 +6,7 @@
 
 # ©️ Codrago, 2024-2030
 # This file is a part of Heroku Userbot
-# 🌐 https://github.com/coddrago/Heroku
+# 🌐 https://github.com/Nyashka17/Heroku.git
 # You can redistribute it and/or modify it under the terms of the GNU AGPLv3
 # 🔑 https://www.gnu.org/licenses/agpl-3.0.html
 
@@ -293,7 +293,7 @@ class TestMod(loader.Module):
             *main.__version__,
             (
                 " <a"
-                f' href="https://github.com/coddrago/Heroku/commit/{ghash}">@{ghash[:8]}</a>'
+                f' href="https://github.com/Nyashka17/Heroku.git/commit/{ghash}">@{ghash[:8]}</a>'
                 if ghash
                 else ""
             ),
