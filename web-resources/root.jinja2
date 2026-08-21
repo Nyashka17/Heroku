@@ -18,9 +18,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js"></script>
 <script src="//unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
-
 <link href="https://css.gg/css?=arrow-right-r|add|brackets|chevron-right-o|smartphone" rel="stylesheet">
-
 <link rel="stylesheet" href="{{ static("base.css") }}">
 {% endblock %}
 
@@ -28,6 +26,157 @@
 {% endblock %}
 
 {% block after %}
+
+<script>
+// Smoke canvas effect
+(function() {
+  const canvas = document.getElementById('smokeCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let width, height;
+  const particles = [];
+  const maxParticles = 30;
+
+  function resize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }
+
+  class Particle {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * width;
+      this.y = height + Math.random() * 200;
+      this.vx = (Math.random() - 0.5) * 0.5;
+      this.vy = -Math.random() * 1.5 - 0.5;
+      this.radius = Math.random() * 150 + 100;
+      this.opacity = 0;
+      this.life = 0;
+      this.maxLife = Math.random() * 300 + 200;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.life++;
+      if (this.life < 50) {
+        this.opacity = Math.min(0.15, this.life / 50 * 0.15);
+      } else if (this.life > this.maxLife - 50) {
+        this.opacity = Math.max(0, (this.maxLife - this.life) / 50 * 0.15);
+      }
+      if (this.life > this.maxLife || this.y < -this.radius) {
+        this.reset();
+      }
+    }
+    draw() {
+      const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+      gradient.addColorStop(0, `rgba(196, 30, 58, ${this.opacity})`);
+      gradient.addColorStop(1, 'rgba(196, 30, 58, 0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < maxParticles; i++) {
+    const p = new Particle();
+    p.life = Math.random() * p.maxLife;
+    particles.push(p);
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+})();
+
+// Embers canvas effect
+(function() {
+  const canvas = document.getElementById('embersCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let width, height;
+  const embers = [];
+  const maxEmbers = 50;
+
+  function resize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }
+
+  class Ember {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * width;
+      this.y = height + 10;
+      this.vx = (Math.random() - 0.5) * 1;
+      this.vy = -Math.random() * 2 - 1;
+      this.size = Math.random() * 3 + 1;
+      this.opacity = Math.random() * 0.8 + 0.2;
+      this.life = 0;
+      this.maxLife = Math.random() * 200 + 100;
+    }
+    update() {
+      this.x += this.vx + Math.sin(this.life * 0.05) * 0.5;
+      this.y += this.vy;
+      this.life++;
+      if (this.life > this.maxLife || this.y < -10) {
+        this.reset();
+      }
+    }
+    draw() {
+      ctx.fillStyle = `rgba(196, 30, 58, ${this.opacity})`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < maxEmbers; i++) {
+    const e = new Ember();
+    e.y = Math.random() * height;
+    embers.push(e);
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+    embers.forEach(e => {
+      e.update();
+      e.draw();
+    });
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+})();
+
+// Intro animation
+setTimeout(() => {
+  document.getElementById('intro').classList.add('hidden');
+}, 3500);
+
+// Hero visibility on load
+setTimeout(() => {
+  const hero = document.getElementById('home');
+  if (hero) hero.classList.add('visible');
+}, 3200);
+</script>
 
 <div class="blur auth vert_center">
   <div id="tg_icon"></div>
@@ -53,144 +202,15 @@
   </div>
 </div>
 
-<div class="wrapper">
-  <div class="blur main finish_block">
-    <div id="installation_icon"></div>
-    <div class="title" style="font-size: 2rem;">Heroku installed</div>
-    <div class="description">
-      Heroku is installed. You can close this page now.
-      <br>
-      <b style="color: var(--accent-gold);">Please be patient — installation may take a while.</b>
-      <br>
-      <b>Check <span style="color:#c41e3a;">Telegram</span> for a message from your <span style="color: var(--accent-gold);">inline bot</span></b>
-    </div>
-  </div>
-
-  <div class="blur main installation">
-    <div class="title">
-      <div class="heroku_label">
-        <div class="label_inner">
-          <img src="{{ platform_emoji }}" class="ringed_planet">
-          &nbsp;HEROKU
-        </div>
-      </div>
-    </div>
+<div class="blur main finish_block">
+  <div id="installation_icon"></div>
+  <div class="title" style="font-size: 2rem; text-align: center;">Heroku installed</div>
+  <div class="description" style="text-align: center; margin-top: 1rem;">
+    Heroku is installed. You can close this page now.
     <br>
-    <div class="description">
-      Incomprehensibly <span style="color:#c41e3a; font-weight:700;">the best</span> userbot
-      <br>
-      <span style="color: var(--accent-red-light); display: none" class="authorized">Authorized!</span>
-    </div>
-    <div class="center">
-      {% if not tg_done %}
-      <div class="button" id="get_started">
-        <div class="horiz_center">
-          <div class="vert_center">
-            Get started
-          </div>
-          <div class="vert_center">
-            <i class="gg-arrow-right-r"></i>
-          </div>
-        </div>
-      </div>
-      {% else %}
-      <div class="button" id="get_started">
-        <div class="horiz_center">
-          <div class="vert_center">
-            Add phone
-          </div>
-          <div class="vert_center">
-            <i class="gg-add"></i>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-
-      {% if skip_creds and not lavhost %}
-      <div class="button" id="enter_api">
-        <div class="horiz_center">
-          <div class="vert_center">
-            Change API Creds
-          </div>
-          <div class="vert_center">
-            <i class="gg-brackets"></i>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-
-      <span id="block_api_id">
-        <label class="api_id" for="api_id">API ID: </label>
-        <input class="api_id" id="api_id" placeholder="••••" style="width: 4em;">
-      </span>
-
-      <span id="block_api_hash">
-        <label class="api_hash" for="api_hash">API Hash: </label>
-        <input class="api_hash" id="api_hash" placeholder="••••••••••••••••••••••••••••••••" style="width: 24em;">
-      </span>
-
-      <span id="block_phone">
-        <label class="phone" for="phone">Phone: </label>
-        <input class="phone" id="phone" placeholder="+••••••••••••" style="width: 12em;">
-      </span>
-
-      <span id="block_custom_bot">
-        <label class="custom_bot" for="custom_bot">Inline bot: </label>
-        <input class="custom_bot" id="custom_bot" placeholder="Leave empty for auto-generation" style="width: 20em;" type="text">
-      </span>
-
-      <span id="block_qr_login">
-        <div class="qr_outer">
-          <div class="qr_inner">
-            <dotlottie-player autoplay loop mode="normal" src="static/4T7FajtZbx.lottie" style="width: 100px; height: 100px"></dotlottie-player>
-          </div>
-        </div>
-        <div class="tg_guide">
-          <ol>
-            <li><span>Open Telegram on your phone</span></li>
-            <li><span>Settings → Devices → Link Desktop Device</span></li>
-            <li><span>Point camera at this screen</span></li>
-          </ol>
-        </div>
-      </span>
-    </div>
-
-    <div class="horiz_center">
-      <div id="continue_btn" class="button">
-        <div class="horiz_center">
-          <div class="vert_center">
-            Continue
-          </div>
-          <div class="vert_center">
-            <i class="gg-chevron-right-o"></i>
-          </div>
-        </div>
-      </div>
-      <div id="denyqr" class="button">
-        <div class="horiz_center">
-          <div class="vert_center">
-            Use phone
-          </div>
-          <div class="vert_center">
-            <i class="gg-smartphone"></i>
-          </div>
-        </div>
-      </div>
-    </div>
+    <b style="color: var(--gold);">Please be patient — installation may take a while.</b>
+    <br>
+    <b>Check <span style="color:#c41e3a;">Telegram</span> for a message from your <span style="color: var(--gold);">inline bot</span></b>
   </div>
 </div>
-
-<script>
-  var skip_creds = "{{ skip_creds }}" == "True";
-  var auth_required = true;
-  fetch("/check_session", {
-    method: "POST",
-    credentials: "include"
-  })
-    .then(response => response.text())
-    .then((response) => {
-      auth_required = response != "1";
-    })
-</script>
-<script src="{{ static("root.js") }}"></script>
 {% endblock %}

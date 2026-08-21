@@ -15,32 +15,25 @@
 -->
 
 <!DOCTYPE html>
-
-<html>
-
+<html lang="ja">
 <head>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;500;700&family=Zen+Kaku+Gothic+New:wght@300;400;700&display=swap">
-  <title>Heroku Userbot</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HEROKU - シャドウ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&family=Zen+Kaku+Gothic+New:wght@300;400;700&display=swap">
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel="icon" href="https://github.com/hikariatama/assets/raw/master/cherry-blossom_1f338.png">
   {% block head %}{% endblock %}
   <style>
     :root {
-      --bg-primary: #0a0a0a;
-      --bg-secondary: #111111;
-      --bg-card: rgba(20, 5, 5, 0.85);
-      --accent-red: #c41e3a;
-      --accent-red-dark: #8b0000;
-      --accent-red-light: #ff2d55;
-      --accent-gold: #d4af37;
-      --accent-gold-light: #ffd700;
-      --text-primary: #f5f5f5;
-      --text-secondary: #b0b0b0;
-      --text-muted: #666666;
-      --border-color: rgba(196, 30, 58, 0.4);
-      --glow-red: rgba(196, 30, 58, 0.6);
+      --crimson: #c41e3a;
+      --vermilion: #e34234;
+      --black: #0a0a0a;
+      --charcoal: #1a1a1a;
+      --white: #f5f5f5;
+      --gray: #888;
+      --gold: #d4af37;
     }
 
     * {
@@ -49,148 +42,276 @@
       box-sizing: border-box;
     }
 
+    html {
+      overflow: hidden;
+    }
+
     body {
-      font-family: 'Zen Kaku Gothic New', sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      overflow-x: hidden;
-      min-height: 100vh;
-    }
-
-    /* Animated Japanese background */
-    .jp-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -2;
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a0505 50%, #0a0a0a 100%);
-    }
-
-    .jp-bg::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        radial-gradient(circle at 20% 80%, rgba(196, 30, 58, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(139, 0, 0, 0.15) 0%, transparent 50%);
-      animation: bgPulse 8s ease-in-out infinite;
-    }
-
-    @keyframes bgPulse {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
-    }
-
-    /* Floating sakura petals */
-    .sakura-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
+      font-family: 'Noto Sans JP', 'Zen Kaku Gothic New', sans-serif;
+      background: var(--black);
+      color: var(--white);
       overflow: hidden;
-      pointer-events: none;
+      height: 100vh;
+      width: 100vw;
     }
 
-    .petal {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: radial-gradient(ellipse at center, rgba(255, 183, 197, 0.8) 0%, rgba(196, 30, 58, 0.4) 100%);
-      border-radius: 50% 0 50% 0;
+    /* Intro Overlay */
+    .intro-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--black);
+      z-index: 10000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 1.2s ease, visibility 1.2s ease;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .intro-overlay.hidden {
       opacity: 0;
-      animation: petalFall linear infinite;
-    }
-
-    @keyframes petalFall {
-      0% {
-        opacity: 0;
-        transform: translateY(-10vh) rotate(0deg) translateX(0);
-      }
-      10% {
-        opacity: 0.8;
-      }
-      90% {
-        opacity: 0.6;
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(110vh) rotate(720deg) translateX(100px);
-      }
-    }
-
-    /* Rising smoke effect */
-    .smoke-container {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      overflow: hidden;
+      visibility: hidden;
       pointer-events: none;
     }
 
-    .smoke {
-      position: absolute;
-      bottom: -50px;
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, rgba(196, 30, 58, 0.15) 0%, transparent 70%);
-      border-radius: 50%;
-      animation: smokeRise 12s ease-out infinite;
+    .intro-content {
+      text-align: center;
+      position: relative;
     }
 
-    @keyframes smokeRise {
-      0% {
-        opacity: 0;
-        transform: translateY(0) scale(1);
-      }
-      20% {
-        opacity: 0.4;
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-100vh) scale(3);
+    .intro-kanji {
+      font-size: 8rem;
+      font-weight: 900;
+      color: var(--crimson);
+      opacity: 0;
+      transform: scale(0.8);
+      animation: introReveal 2s ease-out 0.5s forwards;
+      text-shadow: 0 0 60px rgba(196, 30, 58, 0.5);
+    }
+
+    .intro-line {
+      width: 0;
+      height: 2px;
+      background: var(--crimson);
+      margin: 2rem auto;
+      animation: lineExpand 1.5s ease-out 1.5s forwards;
+    }
+
+    .intro-text {
+      font-size: 1rem;
+      letter-spacing: 0.8em;
+      color: var(--gray);
+      opacity: 0;
+      animation: fadeIn 1s ease-out 2s forwards;
+    }
+
+    @keyframes introReveal {
+      to {
+        opacity: 1;
+        transform: scale(1);
       }
     }
 
-    /* Main content area */
+    @keyframes lineExpand {
+      to {
+        width: 120px;
+      }
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Background canvases */
+    #smokeCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      filter: blur(60px);
+      opacity: 0.6;
+      will-change: transform;
+    }
+
+    #embersCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    /* Main container */
     .main_content {
       display: none;
       position: relative;
       z-index: 10;
+      height: 100vh;
+      width: 100vw;
     }
 
-    /* Wrapper for centering */
-    .wrapper {
-      width: 100%;
-      min-height: 100vh;
-      position: relative;
+    /* Hero section */
+    .hero {
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      will-change: transform, opacity;
+    }
+
+    .hero.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hero.fade-out {
+      opacity: 0;
+      transform: scale(1.1);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      text-align: center;
+    }
+
+    .kanji {
+      font-size: 12rem;
+      font-weight: 900;
+      color: var(--crimson);
+      line-height: 1;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 40px rgba(196, 30, 58, 0.3);
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { text-shadow: 0 0 40px rgba(196, 30, 58, 0.3); }
+      50% { text-shadow: 0 0 80px rgba(196, 30, 58, 0.6); }
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      font-weight: 300;
+      letter-spacing: 0.8em;
+      color: var(--gray);
+      margin-bottom: 3rem;
+    }
+
+    /* CTA Button */
+    .cta {
+      display: inline-block;
+      padding: 1rem 3rem;
+      border: 1px solid var(--crimson);
+      color: var(--white);
+      text-decoration: none;
+      letter-spacing: 0.3em;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      background: transparent;
+      font-family: inherit;
+    }
+
+    .cta::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: var(--crimson);
+      transition: left 0.3s;
+      z-index: -1;
+    }
+
+    .cta:hover::before {
+      left: 0;
+    }
+
+    /* Install section */
+    .install-section {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 5;
       padding: 2rem;
     }
 
-    /* Japanese-style card */
+    .install-section.active {
+      display: flex;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--charcoal);
+      padding: 3rem;
+      border-left: 3px solid var(--crimson);
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, transparent 50%, rgba(196, 30, 58, 0.1) 50%);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(196, 30, 58, 0.2);
+    }
+
+    .card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--white);
+    }
+
+    .card p {
+      color: var(--gray);
+      line-height: 1.8;
+      font-weight: 300;
+    }
+
+    /* Form elements */
     .blur {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
+      background: rgba(20, 5, 5, 0.85);
+      border: 1px solid rgba(196, 30, 58, 0.4);
       border-radius: 4px;
       backdrop-filter: blur(12px);
       position: relative;
       z-index: 99;
-      box-shadow: 
-        0 0 30px rgba(196, 30, 58, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 30px rgba(196, 30, 58, 0.2);
       overflow: hidden;
     }
 
@@ -201,88 +322,61 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: linear-gradient(90deg, 
-        transparent 0%, 
-        var(--accent-red) 20%, 
-        var(--accent-gold) 50%, 
-        var(--accent-red) 80%, 
-        transparent 100%);
+      background: linear-gradient(90deg, transparent 0%, var(--crimson) 20%, var(--gold) 50%, var(--crimson) 80%, transparent 100%);
       opacity: 0.8;
     }
 
-    /* Title styling */
-    .title {
-      font-family: 'Noto Serif JP', serif;
-      font-size: 2.5rem;
-      font-weight: 700;
+    input {
+      outline: none;
+      color: var(--white);
       text-align: center;
-      color: var(--text-primary);
-      position: relative;
-      z-index: 2;
-      text-shadow: 0 0 20px rgba(196, 30, 58, 0.5);
-      letter-spacing: 0.1em;
-    }
-
-    .title::after {
-      content: '';
-      display: block;
-      width: 60%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent-red), transparent);
-      margin: 1rem auto 0;
-    }
-
-    /* Description text */
-    .description {
-      font-size: 1rem;
-      color: var(--text-secondary);
-      text-align: center;
-      line-height: 1.8;
-      font-weight: 300;
-    }
-
-    /* Japanese label */
-    .heroku_label {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      background: linear-gradient(135deg, var(--accent-red-dark) 0%, var(--accent-red) 100%);
-      padding: 12px 24px;
       border-radius: 2px;
-      font-family: 'Noto Serif JP', serif;
-      color: var(--text-primary);
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-      box-shadow: 
-        0 4px 15px rgba(196, 30, 58, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      border: 1px solid var(--accent-red-light);
+      padding: 12px 20px;
+      border: 1px solid rgba(196, 30, 58, 0.4);
+      background: rgba(10, 10, 10, 0.8);
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
     }
 
-    .ringed_planet {
-      height: 28px;
-      filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
+    input:focus {
+      border-color: var(--crimson);
+      box-shadow: 0 0 15px rgba(196, 30, 58, 0.3);
+    }
+
+    input::placeholder {
+      color: #666;
+    }
+
+    label {
+      margin: 0 10px;
+      color: var(--gray);
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      user-select: none;
     }
 
     /* Buttons */
     .button {
-      position: relative;
+      border-radius: 2px;
       padding: 14px 32px;
-      border: 1px solid var(--accent-red);
+      border: 1px solid var(--crimson);
+      color: var(--white);
+      margin: 8px 4px;
       background: linear-gradient(135deg, rgba(196, 30, 58, 0.15) 0%, rgba(139, 0, 0, 0.15) 100%);
-      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+      min-height: 48px;
+      box-sizing: border-box;
       font-family: 'Zen Kaku Gothic New', sans-serif;
       font-size: 0.95rem;
       font-weight: 500;
       letter-spacing: 0.05em;
-      border-radius: 2px;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow: hidden;
       text-transform: uppercase;
-      min-height: 48px;
+      position: relative;
+      overflow: hidden;
     }
 
     .button::before {
@@ -297,12 +391,10 @@
     }
 
     .button:hover {
-      border-color: var(--accent-red-light);
-      box-shadow: 
-        0 0 25px rgba(196, 30, 58, 0.4),
-        inset 0 0 20px rgba(196, 30, 58, 0.1);
+      border-color: var(--vermilion);
+      box-shadow: 0 0 25px rgba(196, 30, 58, 0.4);
       transform: translateY(-2px);
-      color: var(--accent-gold-light);
+      color: var(--gold);
     }
 
     .button:hover::before {
@@ -314,62 +406,7 @@
       transition: transform 0.1s ease;
     }
 
-    .button i {
-      margin-left: 0.5em;
-      opacity: 0.8;
-    }
-
-    .button {
-      margin: 8px 4px;
-    }
-
-    /* Input fields */
-    input {
-      outline: none;
-      color: var(--text-primary);
-      text-align: center;
-      border-radius: 2px;
-      padding: 12px 20px;
-      border: 1px solid var(--border-color);
-      background: rgba(10, 10, 10, 0.8);
-      font-family: 'Zen Kaku Gothic New', sans-serif;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(4px);
-    }
-
-    input:focus {
-      border-color: var(--accent-red);
-      box-shadow: 
-        0 0 15px rgba(196, 30, 58, 0.3),
-        inset 0 0 10px rgba(196, 30, 58, 0.1);
-    }
-
-    input::placeholder {
-      color: var(--text-muted);
-    }
-
-    label {
-      margin: 0 10px;
-      color: var(--text-secondary);
-      font-weight: 300;
-      letter-spacing: 0.05em;
-      user-select: none;
-    }
-
-    /* Hide blocks */
-    #denyqr,
-    #continue_btn,
-    #block_api_id,
-    #block_api_hash,
-    #block_phone,
-    #block_2fa,
-    #block_custom_bot,
-    #block_qr_login {
-      display: none;
-    }
-
-    /* Center utilities */
+    /* Utility */
     .horiz_center {
       display: flex;
       justify-content: center;
@@ -383,7 +420,6 @@
       align-items: center;
     }
 
-    /* Center container */
     .center {
       display: flex;
       justify-content: center;
@@ -419,10 +455,10 @@
     }
 
     .confirm_auth {
-      font-family: 'Noto Serif JP', serif;
+      font-family: 'Noto Sans JP', sans-serif;
       font-size: 1.8rem;
       text-align: center;
-      color: var(--text-primary);
+      color: var(--white);
       padding: 1rem 0;
       text-shadow: 0 0 10px rgba(196, 30, 58, 0.5);
     }
@@ -430,12 +466,12 @@
     .waiting_for_auth {
       font-size: 1.1rem;
       text-align: center;
-      color: var(--text-secondary);
+      color: var(--gray);
       padding: 1rem 0;
       letter-spacing: 0.1em;
     }
 
-    /* Code input form */
+    /* Auth code form */
     .auth-code-form,
     .eula-form {
       display: none;
@@ -473,10 +509,9 @@
 
     .enter {
       padding: 8px 16px;
-      border: 1px solid var(--accent-red);
-      color: var(--accent-red-light);
+      border: 1px solid var(--crimson);
+      color: var(--vermilion);
       font-size: 1.1rem;
-      font-weight: 500;
       border-radius: 2px;
       width: auto;
       margin: 1rem auto;
@@ -488,8 +523,8 @@
     }
 
     .enter:hover {
-      background: var(--accent-red);
-      color: var(--text-primary);
+      background: var(--crimson);
+      color: var(--white);
       box-shadow: 0 0 20px rgba(196, 30, 58, 0.4);
     }
 
@@ -507,27 +542,25 @@
       transform: scale(0.98);
     }
 
-    /* Animation containers */
     #monkey,
     #monkey-close,
     #law,
     #installation_icon,
     #tg_icon {
       height: 200px;
-      margin: 1.5rem auto;
+      margin-top: 1.5rem;
     }
 
     #monkey-close {
       display: none;
     }
 
-    /* Code input */
     .code-input {
       width: 50%;
       margin-top: 1.5rem;
       height: 44px;
       border-radius: 2px;
-      border: 1px solid var(--border-color);
+      border: 1px solid rgba(196, 30, 58, 0.4);
       background: rgba(10, 10, 10, 0.9);
       transition: all 0.3s ease;
       font-size: 1.1rem;
@@ -535,34 +568,16 @@
     }
 
     .code-input:focus {
-      border-color: var(--accent-red);
+      border-color: var(--crimson);
       box-shadow: 0 0 20px rgba(196, 30, 58, 0.3);
-      outline: none;
     }
 
     .code-caption {
-      font-family: 'Noto Serif JP', serif;
+      font-family: 'Noto Sans JP', sans-serif;
       font-size: 1.2rem;
-      color: var(--text-primary);
+      color: var(--white);
       padding-top: 2rem;
       letter-spacing: 0.05em;
-    }
-
-    /* Guide list */
-    .tg_guide ol {
-      list-style: none;
-      counter-reset: item;
-      padding: 0 2rem;
-      text-align: left;
-    }
-
-    .tg_guide ol li {
-      counter-increment: item;
-      margin: 1rem 0;
-      display: flex;
-      color: var(--text-secondary);
-      font-size: 1rem;
-      line-height: 1.6;
     }
 
     .tg_guide ol li::before {
@@ -572,23 +587,28 @@
       align-items: center;
       min-width: 1.5rem;
       height: 1.5rem;
-      margin-right: 1rem;
-      background: linear-gradient(135deg, var(--accent-red) 0%, var(--accent-red-dark) 100%);
+      margin: 0 0.75rem 0 0;
+      background: linear-gradient(135deg, var(--crimson) 0%, #8b0000 100%);
       border-radius: 2px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-primary);
+      font-size: smaller;
+      color: #fff;
       box-shadow: 0 0 10px rgba(196, 30, 58, 0.3);
     }
 
-    /* QR code container */
-    .qr_outer {
-      display: inline-block;
-      padding: 20px;
-      border-radius: 4px;
-      background: rgba(10, 10, 10, 0.9);
-      border: 1px solid var(--border-color);
-      box-shadow: 0 0 30px rgba(196, 30, 58, 0.2);
+    .tg_guide ol {
+      list-style: none;
+      counter-reset: item;
+      padding: 0 1.75rem;
+    }
+
+    .tg_guide ol li {
+      counter-increment: item;
+      text-align: left;
+      margin: 0.75rem 0;
+      display: flex;
+      color: var(--gray);
+      font-size: 1rem;
+      line-height: 1.6;
     }
 
     .qr_inner {
@@ -601,51 +621,6 @@
       background: rgba(255, 255, 255, 0.95);
     }
 
-    /* Finish block */
-    .finish_block {
-      display: none;
-    }
-
-    /* Retro CRT effect */
-    .crt::after {
-      content: " ";
-      display: block;
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-      background: rgba(18, 16, 16, 0.1);
-      opacity: 0;
-      z-index: 9999;
-      pointer-events: none;
-      animation: flicker 0.15s infinite;
-    }
-
-    @keyframes flicker {
-      0% { opacity: 0.02; }
-      50% { opacity: 0.05; }
-      100% { opacity: 0.02; }
-    }
-
-    /* Scanline effect */
-    .scanlines {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 9998;
-      pointer-events: none;
-      opacity: 0.03;
-      background: linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0.03) 50%,
-        rgba(0, 0, 0, 0.03) 50%
-      );
-      background-size: 100% 4px;
-    }
-
     /* Responsive */
     @media screen and (max-width: 736px) {
       .blur {
@@ -654,6 +629,10 @@
         padding: 1.5rem;
         border-radius: 0;
         border: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
       }
 
       .title {
@@ -662,23 +641,20 @@
         line-height: normal;
       }
 
-      .description {
-        font-size: 0.9rem;
+      .finish_block,
+      .auth {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
       }
 
-      .heroku_label {
-        font-size: 1.2rem;
-        padding: 10px 18px;
+      .install-section {
+        padding: 1rem;
       }
 
-      .button {
-        padding: 12px 24px;
-        font-size: 0.85rem;
-      }
-
-      input {
-        font-size: 0.85rem;
-        padding: 10px 16px;
+      .kanji {
+        font-size: 6rem;
       }
     }
 
@@ -688,22 +664,21 @@
     }
 
     ::-webkit-scrollbar-track {
-      background: var(--bg-primary);
+      background: var(--black);
     }
 
     ::-webkit-scrollbar-thumb {
-      background: var(--accent-red-dark);
+      background: #8b0000;
       border-radius: 2px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: var(--accent-red);
+      background: var(--crimson);
     }
 
-    /* Selection */
     ::selection {
-      background: var(--accent-red);
-      color: var(--text-primary);
+      background: var(--crimson);
+      color: var(--white);
     }
 
     /* Loading animation */
@@ -717,20 +692,190 @@
       40% { content: '..'; }
       60%, 100% { content: '...'; }
     }
+
+    /* QR Login specific */
+    #block_qr_login {
+      display: none;
+    }
+
+    .qr_outer {
+      display: inline-block;
+      padding: 20px;
+      border-radius: 4px;
+      background: rgba(10, 10, 10, 0.9);
+      border: 1px solid rgba(196, 30, 58, 0.4);
+      box-shadow: 0 0 30px rgba(196, 30, 58, 0.2);
+    }
+
+    #root {
+      position: relative;
+      display: inline-block;
+    }
   </style>
 </head>
 
-<body class="crt">
-  <div class="scanlines"></div>
-  
-  <div class="jp-bg"></div>
-  
-  <div class="sakura-container" id="sakura"></div>
-  
-  <div class="smoke-container" id="smoke"></div>
+<body>
+  <canvas id="smokeCanvas"></canvas>
+  <canvas id="embersCanvas"></canvas>
 
-  <div class="main_content">{% block content %}{% endblock %}</div>
-  {% block after %}{% endblock %}
+  <div class="intro-overlay" id="intro">
+    <div class="intro-content">
+      <div class="intro-kanji">シャドウ</div>
+      <div class="intro-line"></div>
+      <div class="intro-text">HEROKU</div>
+    </div>
+  </div>
+
+  <div class="main_content">
+    <div class="hero" id="home">
+      <div class="hero-content">
+        <div class="kanji">ホ</div>
+        <div class="subtitle">USERBOT</div>
+        <div class="center">
+          <div class="button" id="get_started">
+            <div class="horiz_center">
+              <div class="vert_center">
+                Get started
+              </div>
+              <div class="vert_center">
+                <span style="margin-left:0.5em;">→</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="install-section installation" id="install">
+      <div class="blur" style="max-width: 800px; width: 100%; padding: 3rem;">
+        <div class="title" style="font-family: 'Noto Sans JP', serif; font-size: 2rem; text-align: center; margin-bottom: 2rem;">
+          <span style="color: var(--crimson);">インストール</span>
+        </div>
+        <div class="description" style="text-align: center; color: var(--gray); margin-bottom: 2rem;">
+          Configure your Heroku instance
+        </div>
+
+        <div class="center" style="flex-direction: column; gap: 1rem;">
+          {% if skip_creds and not lavhost %}
+          <div class="button" id="enter_api" style="min-width: 300px;">
+            <div class="horiz_center">
+              <div class="vert_center">
+                Change API Creds
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <span id="block_api_id">
+            <label class="api_id" for="api_id">API ID: </label>
+            <input class="api_id" id="api_id" placeholder="••••" style="width: 4em;">
+          </span>
+
+          <span id="block_api_hash">
+            <label class="api_hash" for="api_hash">API Hash: </label>
+            <input class="api_hash" id="api_hash" placeholder="••••••••••••••••••••••••••••••••" style="width: 24em;">
+          </span>
+
+          <span id="block_phone">
+            <label class="phone" for="phone">Phone: </label>
+            <input class="phone" id="phone" placeholder="+••••••••••••" style="width: 12em;">
+          </span>
+
+          <span id="block_custom_bot">
+            <label class="custom_bot" for="custom_bot">Inline bot: </label>
+            <input class="custom_bot" id="custom_bot" placeholder="Leave empty for auto" style="width: 20em;" type="text">
+          </span>
+
+          <span id="block_qr_login">
+            <div class="qr_outer">
+              <div class="qr_inner">
+                <dotlottie-player autoplay loop mode="normal" src="static/4T7FajtZbx.lottie" style="width: 100px; height: 100px"></dotlottie-player>
+              </div>
+            </div>
+            <div class="tg_guide" style="margin-top: 1.5rem;">
+              <ol>
+                <li><span>Open Telegram on your phone</span></li>
+                <li><span>Settings → Devices → Link Desktop Device</span></li>
+                <li><span>Point camera at this screen</span></li>
+              </ol>
+            </div>
+          </span>
+        </div>
+
+        <div class="horiz_center" style="margin-top: 2rem;">
+          <div id="continue_btn" class="button">
+            <div class="horiz_center">
+              <div class="vert_center">
+                Continue
+              </div>
+              <div class="vert_center">
+                <span style="margin-left:0.5em;">→</span>
+              </div>
+            </div>
+          </div>
+          <div id="denyqr" class="button">
+            <div class="horiz_center">
+              <div class="vert_center">
+                Use phone
+              </div>
+              <div class="vert_center">
+                <span style="margin-left:0.5em;">📱</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="blur auth vert_center">
+    <div id="tg_icon"></div>
+    <div class="waiting_for_auth">Waiting for authentication<span class="loading-dots"></span></div>
+    <div class="confirm_auth">Please confirm in <span style="color:#c41e3a; font-weight:700;">Telegram</span></div>
+  </div>
+
+  <div class="auth-code-form blur">
+    <div id="monkey"></div>
+    <div id="monkey-close"></div>
+    <span class="code-caption">Enter the code from Telegram</span>
+    <input type="text" class="code-input" autocomplete="off" maxlength="5">
+    <div class="enter">Enter</div>
+  </div>
+
+  <div class="eula-form blur">
+    <div class="vert_center" style="height: 100%">
+      <div>
+        <div id="law"></div>
+        <br><br>
+        <span class="code-caption">You are <span style="color:#c41e3a; font-weight:700;">prohibited</span> from adding more than 1 account on the current platform by its EULA.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="blur main finish_block">
+    <div id="installation_icon"></div>
+    <div class="title" style="font-size: 2rem; text-align: center;">Heroku installed</div>
+    <div class="description" style="text-align: center; margin-top: 1rem;">
+      Heroku is installed. You can close this page now.
+      <br>
+      <b style="color: var(--gold);">Please be patient — installation may take a while.</b>
+      <br>
+      <b>Check <span style="color:#c41e3a;">Telegram</span> for a message from your <span style="color: var(--gold);">inline bot</span></b>
+    </div>
+  </div>
+
+  <script>
+    var skip_creds = "{{ skip_creds }}" == "True";
+    var auth_required = true;
+    fetch("/check_session", {
+      method: "POST",
+      credentials: "include"
+    })
+      .then(response => response.text())
+      .then((response) => {
+        auth_required = response != "1";
+      })
+  </script>
+  <script src="{{ static("root.js") }}"></script>
 </body>
-
 </html>

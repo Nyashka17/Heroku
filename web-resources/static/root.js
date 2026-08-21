@@ -1,11 +1,9 @@
 function auth(c) {
-    $(".main").addClass("fade-out"),
+    $(".main").fadeOut(250),
         setTimeout(() => {
             $(".auth")
-                .removeClass("fade-out")
-                .addClass("fade-in")
-                .css("display", "flex")
-                .hide().fadeIn(400, () => {
+                .hide()
+                .fadeIn(250, () => {
                     $("#tg_icon").html(""),
                         bodymovin.loadAnimation({
                             container: document.getElementById("tg_icon"),
@@ -29,18 +27,18 @@ function auth(c) {
                             (error_message(
                                 "Code waiting timeout exceeded. Reload page and try again.",
                             ),
-                                void $(".auth").fadeOut(400)) :
+                                void $(".auth").fadeOut(250)) :
                             a.startsWith("heroku_") ?
                                 ($.cookie("session", a),
                                     (auth_required = !1),
-                                    $(".authorized").hide().fadeIn(300),
-                                    $(".auth").fadeOut(400, () => {
-                                        $(".installation").removeClass("fade-out").addClass("fade-in").fadeIn(400);
+                                    $(".authorized").hide().fadeIn(100),
+                                    $(".auth").fadeOut(250, () => {
+                                        $(".installation").fadeIn(250);
                                     }),
                                     void c()) :
                                 void 0,
                     );
-        }, 400);
+        }, 250);
 }
 
 var qr_interval = null,
@@ -53,9 +51,9 @@ var qr_interval = null,
     (document.querySelector(".qr_inner").style.height = "100px");
 
 function login_qr() {
-    $("#continue_btn").fadeOut(200),
-        $("#denyqr").hide().fadeIn(400),
-        $(".title, .description").fadeOut(300),
+    $("#continue_btn").fadeOut(100),
+        $("#denyqr").hide().fadeIn(250),
+        $(".title, .description").fadeOut(250),
         fetch("/init_qr_login", {
             method: "POST",
             credentials: "include"
@@ -77,32 +75,36 @@ function login_qr() {
                         color: "transparent"
                     },
                     imageOptions: {
-                        imageSize: 0.4
+                        imageSize: 0.4,
+                        margin: 8
+                    },
+                    qrOptions: {
+                        errorCorrectionLevel: "M"
                     },
                 });
-                d.append(document.getElementById("root"));
-                d.update({
-                    data: c
-                });
-                qr_interval = setInterval(() => {
-                    fetch("/get_qr_url", {
-                        method: "POST",
-                        credentials: "include"
-                    })
-                        .then((b) => b.text())
-                        .then((b) =>
-                            "SUCCESS" == b || "2FA" == b ?
-                                ($("#block_qr_login").fadeOut(300),
-                                    $("#denyqr").fadeOut(300),
-                                    $("#continue_btn, .title, .description").hide().fadeIn(400),
-                                    "SUCCESS" == b && switch_block("custom_bot"),
-                                    "2FA" == b && (show_2fa(), (qr_login = !0)),
-                                    void clearInterval(qr_interval)) :
-                                void d.update({
-                                    data: b
-                                }),
-                        );
-                }, 1250);
+                (document.querySelector(".qr_inner").innerHTML = ""),
+                    (document.querySelector(".qr_inner").style.width = old_qr_sizes[0]),
+                    (document.querySelector(".qr_inner").style.height = old_qr_sizes[1]),
+                    d.append(document.querySelector(".qr_inner")),
+                    (qr_interval = setInterval(() => {
+                        fetch("/get_qr_url", {
+                            method: "POST",
+                            credentials: "include"
+                        })
+                            .then((b) => b.text())
+                            .then((b) =>
+                                "SUCCESS" == b || "2FA" == b ?
+                                    ($("#block_qr_login").fadeOut(250),
+                                        $("#denyqr").fadeOut(250),
+                                        $("#continue_btn, .title, .description").hide().fadeIn(250),
+                                        "SUCCESS" == b && switch_block("custom_bot"),
+                                        "2FA" == b && (show_2fa(), (qr_login = !0)),
+                                        void clearInterval(qr_interval)) :
+                                    void d.update({
+                                        data: b
+                                    }),
+                            );
+                    }, 1250));
             });
 }
 
@@ -116,10 +118,11 @@ $("#get_started").click(() => {
                 auth(() => {
                     $("#get_started").click();
                 }) :
-                void ($("#continue_btn").hide().fadeIn(400),
+                void ($("#install").addClass("active"),
+                    $("#continue_btn").hide().fadeIn(250),
                     $("#denyqr").hide(),
-                    $("#enter_api").fadeOut(300),
-                    $("#get_started").fadeOut(400, () => {
+                    $("#enter_api").fadeOut(250),
+                    $("#get_started").fadeOut(250, () => {
                         switch_block(_current_block);
                     })) :
             void show_eula(),
@@ -130,15 +133,15 @@ $("#get_started").click(() => {
             auth(() => {
                 $("#enter_api").click();
             }) :
-            void ($("#get_started").fadeOut(300),
-                $("#enter_api").fadeOut(300, () => {
-                    $("#continue_btn").hide().fadeIn(400), switch_block("api_id");
+            void ($("#get_started").fadeOut(250),
+                $("#enter_api").fadeOut(250, () => {
+                    $("#continue_btn").hide().fadeIn(250), switch_block("api_id");
                 })),
     );
 
 function isInt(c) {
     var a = parseFloat(c);
-    return !isNaN(c) && (0 | a) === a;
+    return !isNaN(a) && (0 | a) === a;
 }
 
 function isValidPhone(b) {
@@ -147,9 +150,9 @@ function isValidPhone(b) {
 
 function finish_login() {
     console.log("Done")
-    $(".finish_block").removeClass("fade-out").addClass("fade-in").fadeIn(600);
+    $(".finish_block").fadeIn()
     $("#installation_icon").html("")
-    $(".installation").fadeOut(400);
+    $(".installation").fadeOut()
     bodymovin.loadAnimation({
         container: document.getElementById("installation_icon"),
         renderer: "canvas",
@@ -164,10 +167,8 @@ function finish_login() {
 
 function show_2fa() {
     $(".auth-code-form")
-        .removeClass("fade-out")
-        .addClass("fade-in")
-        .css("display", "flex")
-        .hide().fadeIn(400, () => {
+        .hide()
+        .fadeIn(250, () => {
             $("#monkey-close").html(""),
                 (anim = bodymovin.loadAnimation({
                     container: document.getElementById("monkey-close"),
@@ -194,21 +195,19 @@ function show_2fa() {
         $(".code-input").attr("type", "password"),
         $(".enter").hasClass("tgcode") && $(".enter").removeClass("tgcode"),
         $(".code-caption").html(
-            "Enter your Telegram 2FA password, then press <span style='color: #c41e3a; font-weight:700;'>Enter</span>",
+            "Enter your Telegram 2FA password, then press <span style='color: #c41e3a;'>Enter</span>",
         ),
         cnt_btn.setAttribute("current-step", "2fa"),
         $("#monkey").hide(),
-        $("#monkey-close").hide().fadeIn(300),
+        $("#monkey-close").hide().fadeIn(100),
         (_current_block = "2fa");
 }
 
 function show_eula() {
-    $(".main").fadeOut(300),
+    $(".main").fadeOut(250),
         $(".eula-form")
-            .removeClass("fade-out")
-            .addClass("fade-in")
-            .css("display", "flex")
-            .hide().fadeIn(400, () => {
+            .hide()
+            .fadeIn(250, () => {
                 $("#law").html(""),
                     (anim = bodymovin.loadAnimation({
                         container: document.getElementById("law"),
@@ -233,8 +232,8 @@ function tg_code(b = false) {
             b.ok ?
                 (console.log("ko"),
                 finish_login(),
-                    $("#block_phone").fadeOut(300),
-                    $(".auth-code-form").fadeOut(300)) :
+                    $("#block_phone").fadeOut(),
+                    $(".auth-code-form").fadeOut()) :
                 ($(".code-input").removeAttr("disabled"),
                     b.text().then((b) => {
                         error_state(), Swal.fire("Error", b, "error");
@@ -249,8 +248,8 @@ function tg_code(b = false) {
                 b.ok ?
                     (console.log("ok"),
                     finish_login(),
-                        $("#block_phone").fadeOut(300),
-                        $(".auth-code-form").fadeOut(300)) :
+                        $("#block_phone").fadeOut(),
+                        $(".auth-code-form").fadeOut()) :
                     401 == b.status ?
                         show_2fa() :
                         ($(".code-input").removeAttr("disabled"),
@@ -267,11 +266,11 @@ function tg_code(b = false) {
 function switch_block(b) {
     cnt_btn.setAttribute("current-step", b);
     try {
-        $(`#block_${_current_block}`).fadeOut(300, () => {
-            $(`#block_${b}`).hide().fadeIn(400);
+        $(`#block_${_current_block}`).fadeOut(() => {
+            $(`#block_${b}`).hide().fadeIn();
         });
     } catch {
-        $(`#block_${b}`).hide().fadeIn(400);
+        $(`#block_${b}`).hide().fadeIn();
     }
     (_current_block = b), "qr_login" == _current_block && login_qr();
 }
@@ -355,10 +354,8 @@ function process_next() {
                 .then((b) => {
                     b.ok ?
                         ($(".auth-code-form")
-                            .removeClass("fade-out")
-                            .addClass("fade-in")
-                            .css("display", "flex")
-                            .hide().fadeIn(400, () => {
+                            .hide()
+                            .fadeIn(250, () => {
                                 $("#monkey").html(""),
                                     (anim2 = bodymovin.loadAnimation({
                                         container: document.getElementById("monkey"),
@@ -449,8 +446,8 @@ function process_next() {
             void process_next()),
     $("#denyqr").on("click", () => {
         qr_interval && clearInterval(qr_interval),
-            $("#denyqr").fadeOut(300),
-            $("#continue_btn, .title, .description").hide().fadeIn(400),
+            $("#denyqr").fadeOut(250),
+            $("#continue_btn, .title, .description").hide().fadeIn(250),
             switch_block("phone");
     }),
     $(".installation input").on("keyup", (b) =>
