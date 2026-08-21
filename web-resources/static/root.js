@@ -1,4 +1,5 @@
 function auth(c) {
+    console.log('auth called');
     $(".main").fadeOut(250),
         setTimeout(() => {
             $(".auth")
@@ -22,6 +23,10 @@ function auth(c) {
                     timeout: 25e4,
                 })
                     .then((b) => b.text())
+                    .then((a) => {
+                        console.log('web_auth response:', a);
+                        return a;
+                    })
                     .then((a) =>
                         "TIMEOUT" == a ?
                             (error_message(
@@ -33,11 +38,15 @@ function auth(c) {
                                     (auth_required = !1),
                                     $(".authorized").hide().fadeIn(100),
                                     $(".auth").fadeOut(250, () => {
-                                        $(".installation").fadeIn(250);
+                                        $("#install").addClass("active");
                                     }),
                                     void c()) :
-                                void 0,
-                    );
+                                (console.log("Unexpected web_auth response:", a), void 0)
+                    )
+                    .catch((err) => {
+                        console.error("web_auth error:", err);
+                        error_message("Auth request failed: " + err.toString());
+                    });
         }, 250);
 }
 
@@ -109,13 +118,18 @@ function login_qr() {
 }
 
 $("#get_started").click(() => {
+    console.log('get_started clicked, auth_required:', auth_required);
     fetch("/can_add", {
         method: "POST",
         credentials: "include"
+    }).then((b) => {
+        console.log('can_add response:', b.status);
+        return b;
     }).then((b) =>
         b.ok ?
             auth_required ?
                 auth(() => {
+                    console.log('auth callback, clicking get_started again');
                     $("#get_started").click();
                 }) :
                 void ($("#install").addClass("active"),
@@ -123,6 +137,7 @@ $("#get_started").click(() => {
                     $("#denyqr").hide(),
                     $("#enter_api").fadeOut(250),
                     $("#get_started").fadeOut(250, () => {
+                        console.log('showing block:', _current_block);
                         switch_block(_current_block);
                     })) :
             void show_eula(),
@@ -264,6 +279,7 @@ function tg_code(b = false) {
 }
 
 function switch_block(b) {
+    console.log('switch_block:', b, 'current:', _current_block);
     cnt_btn.setAttribute("current-step", b);
     try {
         $(`#block_${_current_block}`).fadeOut(() => {
@@ -272,7 +288,15 @@ function switch_block(b) {
     } catch {
         $(`#block_${b}`).hide().fadeIn();
     }
-    (_current_block = b), "qr_login" == _current_block && login_qr();
+    (_current_block = b);
+    if ("qr_login" == _current_block) {
+        login_qr();
+        $("#denyqr").hide().fadeIn(250);
+        $("#continue_btn").hide();
+    } else {
+        $("#denyqr").hide();
+        $("#continue_btn").hide().fadeIn(250);
+    }
 }
 
 function error_message(b) {
@@ -309,8 +333,10 @@ function is_phone() {
 is_phone() && "qr_login" == _current_block && (_current_block = "phone");
 
 const cnt_btn = document.querySelector("#continue_btn");
+console.log('cnt_btn:', cnt_btn ? 'found' : 'NOT FOUND');
 
 function process_next() {
+    console.log('process_next, current-step:', cnt_btn ? cnt_btn.getAttribute("current-step") : 'cnt_btn is null');
     let b = cnt_btn.getAttribute("current-step");
     if ("api_id" == b) {
         let b = document.querySelector("#api_id").value;

@@ -26,7 +26,6 @@
   <link rel="icon" href="https://github.com/hikariatama/assets/raw/master/cherry-blossom_1f338.png">
   {% block head %}{% endblock %}
   <style>
-    :root {
       --crimson: #c41e3a;
       --vermilion: #e34234;
       --black: #0a0a0a;
@@ -877,5 +876,6 @@
       })
   </script>
   <script src="{{ static("root.js") }}"></script>
+  {% block after %}{% endblock %}
 </body>
 </html>
